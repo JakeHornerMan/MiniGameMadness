@@ -36,7 +36,8 @@ public class TitleManager : MonoBehaviour
     }
 
     public void OnBrainCloudLogOutCompleted(){
-        profileId = "null";
+        profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
+        Debug.Log("Logged out");
         titelInterface.UpdateInterface();
     }
 }

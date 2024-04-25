@@ -71,13 +71,13 @@ public class Network : MonoBehaviour
     {
         BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
         {
-            Debug.Log("ReconnectAnonymousAuthentication success: " + responseData);
+            // Debug.Log("ReconnectAnonymousAuthentication success: " + responseData);
             HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
         };
 
         BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
         {
-            Debug.Log(string.Format("[Reconnect Failed] {0}  {1}  {2}", status, code, error));
+            Debug.LogError(string.Format("[Reconnect Failed] {0}  {1}  {2}", status, code, error));
             if(authenticationRequestFailed != null)
                 authenticationRequestFailed();
         };
@@ -91,14 +91,14 @@ public class Network : MonoBehaviour
         if(IsAuthenticated()){
             BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
             {
-                Debug.Log("Logout success: " + responseData);
+                // Debug.Log("Logout success: " + responseData);
                 if(brainCloudLogOutCompleted != null)
                     brainCloudLogOutCompleted();
             };
 
             BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
             {
-                Debug.Log(string.Format("[Logout Failed] {0}  {1}  {2}", status, code, error));
+                Debug.LogError(string.Format("[Logout Failed] {0}  {1}  {2}", status, code, error));
                 if(brainCloudLogOutFailed != null)
                     brainCloudLogOutFailed();
             };
