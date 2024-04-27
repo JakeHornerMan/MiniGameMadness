@@ -8,6 +8,9 @@ public class TitleManager : MonoBehaviour
     public string brainCloudVersion;
     [SerializeField] private TitelInterface titelInterface;
 
+    private Network.AuthenticationRequestCompleted m_AuthenticationRequestCompleted;
+    private Network.AuthenticationRequestFailed m_AuthenticationRequestFailed;
+
     void Start(){
         HandleAuthentication();
     }
@@ -21,6 +24,7 @@ public class TitleManager : MonoBehaviour
         else{
             Debug.Log("Anonymous Authentication");
             Network.sharedInstance.RequestAnonymousAuthentication(OnAuthenticationRequestCompleted);
+            // titelInterface.OpenAuthWindow();
         }
     }
 
@@ -39,5 +43,16 @@ public class TitleManager : MonoBehaviour
         profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
         Debug.Log("Logged out");
         titelInterface.UpdateInterface();
+    }
+
+    public void Set(Network.AuthenticationRequestCompleted authenticationRequestCompleted, Network.AuthenticationRequestFailed authenticationRequestFailed){
+        m_AuthenticationRequestCompleted = authenticationRequestCompleted;
+        m_AuthenticationRequestFailed = authenticationRequestFailed;
+    }
+
+    public void HandleLogInButtonClick(){
+        Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text,
+        m_AuthenticationRequestCompleted, m_AuthenticationRequestFailed);
+        titelInterface.closeAuthWindow();
     }
 }

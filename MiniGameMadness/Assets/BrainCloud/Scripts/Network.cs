@@ -31,6 +31,10 @@ public class Network : MonoBehaviour
         m_BrainCloud.RunCallbacks();
     }
 
+    void OnApplicationQuit(){
+        m_BrainCloud.Logout(false);
+    }
+
     public string BrainCloudClientVersion{
         get { return m_BrainCloud.Client.BrainCloudClientVersion; }
     }
@@ -59,11 +63,6 @@ public class Network : MonoBehaviour
         };
 
         m_BrainCloud.AuthenticateAnonymous(successCallback, failureCallback);
-    }
-
-    private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted){
-        if(authenticationRequestCompleted != null)
-            authenticationRequestCompleted();
     }
 
     public void Reconnect(AuthenticationRequestCompleted authenticationRequestCompleted = null, 
@@ -105,6 +104,35 @@ public class Network : MonoBehaviour
 
             m_BrainCloud.Logout(true, successCallback, failureCallback);
         }
+        else{
+            Debug.LogError("Logout Failed, there is no user autheticated");
+            if(brainCloudLogOutFailed != null)
+                    brainCloudLogOutFailed();
+        }
+    }
+
+    public void RequestAuthenticationUniversal(string userID, string password, AuthenticationRequestCompleted authenticationRequestCompleted = null,
+        AuthenticationRequestFailed authenticationRequestFailed = null)
+    {
+        BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+        {
+            Debug.Log("UniversalAuthentication success: " + responseData);
+            HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
+        };
+
+        BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
+        {
+            Debug.LogError(string.Format("[UniversalAuthentication Failed] {0}  {1}  {2}", status, code, error));
+            if(authenticationRequestFailed != null)
+                authenticationRequestFailed();
+        };
+
+        m_BrainCloud.AuthenticateUniversal(userID, password, true, successCallback, failureCallback);
+    }
+
+    private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted){
+        if(authenticationRequestCompleted != null)
+            authenticationRequestCompleted();
     }
 
 }
