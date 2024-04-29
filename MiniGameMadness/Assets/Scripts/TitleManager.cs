@@ -30,7 +30,15 @@ public class TitleManager : MonoBehaviour
 
     public void OnAuthenticationRequestCompleted(){
         brainCloudVersion =  Network.sharedInstance.brainCloudVersion;
-        profileId = Network.sharedInstance.data.emailAddress;
+        if(Network.sharedInstance.username != ""){
+            profileId = Network.sharedInstance.username;
+        }
+        else if(Network.sharedInstance.email != ""){
+            profileId = Network.sharedInstance.email;
+        }
+        else{
+            profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
+        }
         // profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId()
         Debug.Log("Signed in with Id: " + profileId);
         titelInterface.UpdateInterface();

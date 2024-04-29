@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-// using BrainCloud.LitJson;
+using LitJson;
 
 public class Network : MonoBehaviour
 {
@@ -77,8 +77,6 @@ public class Network : MonoBehaviour
     {
         BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
         {
-            // data = JsonUtility.FromJson<Data>(responseData);
-            // Debug.Log("ReconnectAuthentication success: " + responseData);
             Debug.Log("ReconnectAuthentication success: " + responseData);
             HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
         };
@@ -168,9 +166,6 @@ public class Network : MonoBehaviour
             {
                 Debug.Log("Username Update success: " + responseData);
 
-                // JsonData jsonData = JsonMapper.ToObject(responseData);
-                // userName = jsonData["data"]["playerName"].ToString();
-
                 if(updateUsernameRequestCompleted != null)
                     updateUsernameRequestCompleted();
             };
@@ -192,6 +187,10 @@ public class Network : MonoBehaviour
     }
 
     private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted){
+        JsonData json = JsonMapper.ToObject(responseData);
+        username = json["data"]["playerName"].ToString();
+        username = json["data"]["emailAddress"].ToString();
+        Debug.Log("email: " + email + ", username: " + username);
         if(authenticationRequestCompleted != null)
             authenticationRequestCompleted();
     }
