@@ -33,12 +33,15 @@ public class TitleManager : MonoBehaviour
         if(Network.sharedInstance.username != ""){
             profileId = Network.sharedInstance.username;
         }
-        else if(Network.sharedInstance.email != ""){
-            profileId = Network.sharedInstance.email;
+        else { 
+            if(Network.sharedInstance.email != ""){
+                profileId = Network.sharedInstance.email;
+            }
+            else{
+                profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
+            }
         }
-        else{
-            profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
-        }
+        
         // profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId()
         Debug.Log("Signed in with Id: " + profileId);
         titelInterface.UpdateInterface();
@@ -52,6 +55,7 @@ public class TitleManager : MonoBehaviour
         profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
         Debug.Log("Logged out");
         titelInterface.UpdateInterface();
+        titelInterface.HandleButtons(false);
     }
 
     public void Set(Network.AuthenticationRequestCompleted authenticationRequestCompleted, Network.AuthenticationRequestFailed authenticationRequestFailed){
@@ -63,15 +67,24 @@ public class TitleManager : MonoBehaviour
         Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text);
         OnAuthenticationRequestCompleted();
         titelInterface.closeAuthWindow();
-        // string storedProfileId = Network.sharedInstance.m_BrainCloud.GetStoredAnonymousId();
-        // if(storedProfileId != null){
-        //     Debug.Log("We have a StoredProfileId: " + storedProfileId);
-        // }
     }
 
     public void HandleLogInEmailButtonClick(){
         Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text);
         OnAuthenticationRequestCompleted();
         titelInterface.closeAuthWindow();
+        titelInterface.HandleButtons(true);
+    }
+
+    public void HandleSetUserNameButtonClick(){
+        if(titelInterface.usernameField.text != null){
+            Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text);
+            Network.sharedInstance.UpdateUserPictureUrl("https://source.unsplash.com/user/c_v_r");
+            OnAuthenticationRequestCompleted();
+            titelInterface.openUsernameWindow(false);
+        }
+        else{
+            Debug.Log("Usrename field is required!");
+        }
     }
 }

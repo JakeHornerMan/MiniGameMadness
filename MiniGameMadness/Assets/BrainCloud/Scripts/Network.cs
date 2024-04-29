@@ -18,6 +18,8 @@ public class Network : MonoBehaviour
     public delegate void BrainCloudLogOutFailed();
     public delegate void UpdateUsernameRequestCompleted();
     public delegate void UpdateUsernameRequestFailed();
+    public delegate void UpdateUserPictureUrlRequestCompleted();
+    public delegate void UpdateUserPictureUrlRequestFailed();
 
 
     void Awake(){
@@ -165,6 +167,7 @@ public class Network : MonoBehaviour
             BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
             {
                 Debug.Log("Username Update success: " + responseData);
+                HandleAuthenticationSuccess(responseData, cbObject);
 
                 if(updateUsernameRequestCompleted != null)
                     updateUsernameRequestCompleted();
@@ -186,10 +189,43 @@ public class Network : MonoBehaviour
         }
     }
 
-    private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted){
+    public void UpdateUserPictureUrl(string profileUrl, UpdateUserPictureUrlRequestCompleted updateUserPictureUrlRequestCompleted = null,
+        UpdateUserPictureUrlRequestFailed updateUserPictureUrlRequestFailed = null)
+    {
+        if(IsAuthenticated()){
+            BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+            {
+                Debug.Log("Profile Image Update success: " + responseData);
+                HandleAuthenticationSuccess(responseData, cbObject);
+
+                if(updateUserPictureUrlRequestCompleted != null)
+                    updateUserPictureUrlRequestCompleted();
+            };
+
+            BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
+            {
+                Debug.LogError(string.Format("[Profile Image Update Failed] {0}  {1}  {2}", status, code, error));
+                if(updateUserPictureUrlRequestFailed != null)
+                    updateUserPictureUrlRequestFailed();
+            };
+
+            m_BrainCloud.PlayerStateService.UpdateUserPictureUrl(profileUrl, successCallback, failureCallback);
+        }
+        else{
+            Debug.LogError("Profile Image Update Failed, there is no user autheticated");
+            if(updateUserPictureUrlRequestFailed != null)
+                    updateUserPictureUrlRequestFailed();
+        }
+    }
+
+    private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted = null){
         JsonData json = JsonMapper.ToObject(responseData);
-        username = json["data"]["playerName"].ToString();
-        username = json["data"]["emailAddress"].ToString();
+        if(responseData.Contains("playerName:")){
+            username = json["data"]["playerName"].ToString();
+        }
+        if(responseData.Contains("emailAddress:")){
+            email = json["data"]["emailAddress"].ToString();
+        }
         Debug.Log("email: " + email + ", username: " + username);
         if(authenticationRequestCompleted != null)
             authenticationRequestCompleted();

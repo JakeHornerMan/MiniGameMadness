@@ -10,8 +10,13 @@ public class TitelInterface : MonoBehaviour
     [SerializeField] private TextMeshProUGUI profileId;
     [SerializeField] private TextMeshProUGUI versionText;
     [SerializeField] private GameObject authWindow;
+    [SerializeField] private GameObject usernameWindow;
     [SerializeField] public TMP_InputField userIDField;
     [SerializeField] public TMP_InputField passwordField;
+    [SerializeField] public TMP_InputField usernameField;
+    [SerializeField] private GameObject logOutBtn;
+    [SerializeField] private GameObject logInBtn;
+    [SerializeField] private GameObject changeUsernameBtn;
     
 
     [Header("Script References")]
@@ -45,5 +50,22 @@ public class TitelInterface : MonoBehaviour
 
     public void closeAuthWindow(){
         authWindow.SetActive(false);
+    }
+
+    public void openUsernameWindow(bool isOpen){
+        usernameWindow.SetActive(isOpen);
+    }
+
+    public void HandleButtons(bool loggedIn){
+        if(loggedIn){
+            logInBtn.SetActive(false);
+            logOutBtn.SetActive(true);
+            changeUsernameBtn.SetActive(true);
+        }
+        else{
+            logInBtn.SetActive(true);
+            logOutBtn.SetActive(false);
+            changeUsernameBtn.SetActive(false);
+        }
     }
 }
