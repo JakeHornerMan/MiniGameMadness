@@ -6,7 +6,9 @@ using UnityEngine.Networking;
 public class Network : MonoBehaviour
 {
     public string brainCloudVersion;
-
+    public string email;
+    public string username;
+    public Data data;
     public static Network sharedInstance;
     public BrainCloudWrapper m_BrainCloud;
     public delegate void AuthenticationRequestCompleted();
@@ -70,7 +72,9 @@ public class Network : MonoBehaviour
     {
         BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
         {
-            // Debug.Log("ReconnectAnonymousAuthentication success: " + responseData);
+            // data = JsonUtility.FromJson<Data>(responseData);
+            // Debug.Log("ReconnectAuthentication success: " + responseData);
+            Debug.Log("ReconnectAuthentication success: " + responseData);
             HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
         };
 
@@ -128,6 +132,26 @@ public class Network : MonoBehaviour
         };
 
         m_BrainCloud.AuthenticateUniversal(userID, password, true, successCallback, failureCallback);
+    }
+
+     public void RequestAuthenticationEmail(string email, string password, AuthenticationRequestCompleted authenticationRequestCompleted = null,
+        AuthenticationRequestFailed authenticationRequestFailed = null)
+    {
+        BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+        {
+            Debug.Log("EmailAuthentication success: " + responseData);
+            HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
+
+        };
+
+        BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
+        {
+            Debug.LogError(string.Format("[EmailAuthentication Failed] {0}  {1}  {2}", status, code, error));
+            if(authenticationRequestFailed != null)
+                authenticationRequestFailed();
+        };
+
+        m_BrainCloud.AuthenticateEmailPassword(email, password, true, successCallback, failureCallback);
     }
 
     private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted){

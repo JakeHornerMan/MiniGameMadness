@@ -209,8 +209,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1683111179}
         m_TargetAssemblyTypeName: TitelInterface, Assembly-CSharp
-        m_MethodName: setAuthWindow
-        m_Mode: 6
+        m_MethodName: closeAuthWindow
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -929,7 +929,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 654875244}
         m_TargetAssemblyTypeName: TitleManager, Assembly-CSharp
-        m_MethodName: HandleLogInButtonClick
+        m_MethodName: HandleLogInEmailButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2499,7 +2499,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'UserId:'
+  m_text: 'Email:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

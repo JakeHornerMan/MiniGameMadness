@@ -30,8 +30,9 @@ public class TitleManager : MonoBehaviour
 
     public void OnAuthenticationRequestCompleted(){
         brainCloudVersion =  Network.sharedInstance.brainCloudVersion;
-        profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
-        Debug.Log("Signed in with Id: " + Network.sharedInstance.m_BrainCloud.GetStoredProfileId());
+        profileId = Network.sharedInstance.data.emailAddress;
+        // profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId()
+        Debug.Log("Signed in with Id: " + profileId);
         titelInterface.UpdateInterface();
     }
 
@@ -50,9 +51,19 @@ public class TitleManager : MonoBehaviour
         m_AuthenticationRequestFailed = authenticationRequestFailed;
     }
 
-    public void HandleLogInButtonClick(){
-        Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text,
-        m_AuthenticationRequestCompleted, m_AuthenticationRequestFailed);
+    public void HandleLogInUniversalButtonClick(){
+        Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text);
+        OnAuthenticationRequestCompleted();
+        titelInterface.closeAuthWindow();
+        // string storedProfileId = Network.sharedInstance.m_BrainCloud.GetStoredAnonymousId();
+        // if(storedProfileId != null){
+        //     Debug.Log("We have a StoredProfileId: " + storedProfileId);
+        // }
+    }
+
+    public void HandleLogInEmailButtonClick(){
+        Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text);
+        OnAuthenticationRequestCompleted();
         titelInterface.closeAuthWindow();
     }
 }
