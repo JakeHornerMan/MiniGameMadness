@@ -7,18 +7,18 @@ public class DeadliftManager : MonoBehaviour
     public DeadliftInterfaceManager dlInterface;
     public GameObject deadlifter;
     public List<int> deadLifts;
-    public int roundNumber = 0;
+    public int roundNumber = -1;
     public int currentDeadlift;
     public int counterProgress = 0;
     public float timeAmount = 5.0f;
     public float timeleft;
     enum State { Rest, Progress, Success, Fail}
-    State gameState;
+    State gameState = State.Success;
     enum Key { Left, Up, Right }
     Key currentKey = Key.Left;
     void Start()
     {
-        SetUpLift();
+        
     }
 
     void Update()
@@ -28,7 +28,8 @@ public class DeadliftManager : MonoBehaviour
             Timer();
         }
         if(gameState == State.Success){
-            //set new lift
+            if (Input.GetKeyDown(KeyCode.Space))
+                SetUpLift();
         }
         if(gameState == State.Fail){
             //end Game
@@ -55,11 +56,17 @@ public class DeadliftManager : MonoBehaviour
             currentKey = Key.Left;
         }
 
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     counterProgress++;
+        // }
+
         if(counterProgress >= currentDeadlift){
             gameState = State.Success;
             Debug.Log("YOU LIFTED!");
             deadlifter.GetComponent<Animator>().Play("success");
             dlInterface.SetSuccessActive();
+            StartCoroutine(CountAndNextRound(2f));
         }
     }
 
@@ -76,9 +83,14 @@ public class DeadliftManager : MonoBehaviour
     }
 
     public void SetUpLift(){
+        deadlifter.GetComponent<Animator>().Play("progress");
+        dlInterface.SetNextRoundButton(false);
+        roundNumber++;
         dlInterface.UpdateWeight(deadLifts[roundNumber]);
-        currentDeadlift = deadLifts[roundNumber]/5;
+        currentDeadlift = deadLifts[roundNumber]/6;
+        Debug.Log("targetNum: " + currentDeadlift);
         timeleft = timeAmount;
+        counterProgress = 0;
         CountDown(3);
         Debug.Log("LETS LIFT");
     }
@@ -100,5 +112,11 @@ public class DeadliftManager : MonoBehaviour
         else{
             CountDown(number);
         } 
+    }
+
+    public IEnumerator CountAndNextRound(float number)
+    {
+        yield return new WaitForSeconds(number);
+        dlInterface.SetNextRoundButton(true);
     }
 }

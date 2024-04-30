@@ -12,6 +12,7 @@ public class DeadliftInterfaceManager : MonoBehaviour
     public TextMeshProUGUI infoText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI timerText;
+    public GameObject nextRoundBtn;
 
     private void Start(){
        
@@ -51,28 +52,13 @@ public class DeadliftInterfaceManager : MonoBehaviour
         obj.SetActive(false);
     }
 
-    public void CountDown(int number){
-
-        StartCoroutine(CountAndWait(number));
-    }
-
-    public IEnumerator CountAndWait(int number)
-    {
-        countDownText.text = number.ToString();
-        yield return new WaitForSeconds(1f);
-        number--;
-        if(number <= 0){
-            SetGoActive(); 
-            countDownText.text = "";
-        }
-        else{
-            CountDown(number);
-        } 
-    }
-
     public void SetCountDown(int number, string option = null){
         countDownText.text = number.ToString();
         if(option != null)
             countDownText.text = option;
+    }
+
+    public void SetNextRoundButton(bool show){
+        nextRoundBtn.SetActive(show);
     }
 }
