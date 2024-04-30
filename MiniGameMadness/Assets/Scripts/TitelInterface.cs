@@ -17,6 +17,7 @@ public class TitelInterface : MonoBehaviour
     [SerializeField] private GameObject logOutBtn;
     [SerializeField] private GameObject logInBtn;
     [SerializeField] private GameObject changeUsernameBtn;
+    [SerializeField] private GameObject leaderBoardUI;
     
 
     [Header("Script References")]
@@ -55,6 +56,11 @@ public class TitelInterface : MonoBehaviour
     public void openUsernameWindow(bool isOpen){
         usernameWindow.SetActive(isOpen);
     }
+
+    public void openLeaderBoardUI(bool isOpen){
+        leaderBoardUI.SetActive(isOpen);
+    }
+    
 
     public void HandleButtons(bool loggedIn){
         if(loggedIn){

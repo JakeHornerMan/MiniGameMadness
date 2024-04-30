@@ -12,7 +12,9 @@ public class DeadliftInterfaceManager : MonoBehaviour
     public TextMeshProUGUI infoText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI scoreText;
     public GameObject nextRoundBtn;
+    public GameObject proceedBtn;
 
     private void Start(){
        
@@ -60,5 +62,13 @@ public class DeadliftInterfaceManager : MonoBehaviour
 
     public void SetNextRoundButton(bool show){
         nextRoundBtn.SetActive(show);
+    }
+
+    public void SetProceedButton(bool show){
+        proceedBtn.SetActive(show);
+    }
+
+    public void SetScore(int score){
+        scoreText.text = score.ToString();
     }
 }

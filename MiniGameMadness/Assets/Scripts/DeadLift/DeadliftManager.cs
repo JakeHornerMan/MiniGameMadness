@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DeadliftManager : MonoBehaviour
 {
@@ -12,13 +13,16 @@ public class DeadliftManager : MonoBehaviour
     public int counterProgress = 0;
     public float timeAmount = 5.0f;
     public float timeleft;
-    enum State { Rest, Progress, Success, Fail}
+    public int playerScore = 0;
+    enum State { Rest, Progress, Success, Fail, Finished}
     State gameState = State.Success;
     enum Key { Left, Up, Right }
     Key currentKey = Key.Left;
+    public Vector3 originalPosition;
+
     void Start()
     {
-        
+        originalPosition = deadlifter.transform.position;
     }
 
     void Update()
@@ -31,12 +35,29 @@ public class DeadliftManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
                 SetUpLift();
         }
-        if(gameState == State.Fail){
+        if(gameState == State.Finished){
             //end Game
         }
     }
 
     public void DeadLifting(){
+        Shake();
+        if(counterProgress >= currentDeadlift){
+            gameState = State.Success;
+            deadlifter.transform.position = originalPosition;
+            Debug.Log("YOU LIFTED!");
+            CaculatePoints();
+            deadlifter.GetComponent<Animator>().Play("success");
+            dlInterface.SetSuccessActive();
+            if(roundNumber + 1 >= deadLifts.Count){
+                HandleScorePost();
+                gameState = State.Finished;
+                dlInterface.SetProceedButton(true);
+            }
+            else{
+                StartCoroutine(CountAndNextRound(1f));
+            }
+        }
         
         if (Input.GetKeyDown(KeyCode.LeftArrow) && currentKey == Key.Left)
         {
@@ -55,19 +76,15 @@ public class DeadliftManager : MonoBehaviour
             counterProgress++;
             currentKey = Key.Left;
         }
+    }
 
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     counterProgress++;
-        // }
-
-        if(counterProgress >= currentDeadlift){
-            gameState = State.Success;
-            Debug.Log("YOU LIFTED!");
-            deadlifter.GetComponent<Animator>().Play("success");
-            dlInterface.SetSuccessActive();
-            StartCoroutine(CountAndNextRound(2f));
-        }
+    public void CaculatePoints(){
+        int add;
+        add = deadLifts[roundNumber] * 100;
+        add += (int)(timeleft * 100);
+        Debug.Log("Pointes added: " + add);
+        playerScore += add;
+        dlInterface.SetScore(playerScore);
     }
 
     public void Timer(){
@@ -78,16 +95,19 @@ public class DeadliftManager : MonoBehaviour
         else{
             gameState = State.Fail;
             Debug.Log("YOU FAILED");
+            HandleScorePost();
             dlInterface.SetFailActive();
+            gameState = State.Finished;
+            dlInterface.SetProceedButton(true);
         }
     }
 
     public void SetUpLift(){
-        deadlifter.GetComponent<Animator>().Play("progress");
         dlInterface.SetNextRoundButton(false);
+        deadlifter.GetComponent<Animator>().Play("progress");
         roundNumber++;
         dlInterface.UpdateWeight(deadLifts[roundNumber]);
-        currentDeadlift = deadLifts[roundNumber]/6;
+        currentDeadlift = deadLifts[roundNumber]/7;
         Debug.Log("targetNum: " + currentDeadlift);
         timeleft = timeAmount;
         counterProgress = 0;
@@ -118,5 +138,19 @@ public class DeadliftManager : MonoBehaviour
     {
         yield return new WaitForSeconds(number);
         dlInterface.SetNextRoundButton(true);
+    }
+
+    public void Shake(){
+        float offsetX = Random.Range(-1f, 1f) * counterProgress/100;
+        float offsetY = Random.Range(-1f, 1f) * counterProgress/100;
+        deadlifter.transform.position = originalPosition + new Vector3(offsetX, offsetY, 0);
+    }
+
+    public void LoadResults(){
+        SceneManager.LoadScene("Results");
+    }
+
+    public void HandleScorePost(){
+        Network.sharedInstance.PostScoreToLeaderboard("Deadlift", playerScore);
     }
 }

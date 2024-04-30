@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
 {
+    [SerializeField] private LeaderboardsManager leaderboardsManager;
     public string profileId; 
     public string brainCloudVersion;
     [SerializeField] private TitelInterface titelInterface;
@@ -11,8 +13,11 @@ public class TitleManager : MonoBehaviour
     private Network.AuthenticationRequestCompleted m_AuthenticationRequestCompleted;
     private Network.AuthenticationRequestFailed m_AuthenticationRequestFailed;
 
+    private PopulateLeaderBoardUI populateLeaderBoardUI;
+
     void Start(){
-        HandleAuthentication();
+        if(!Network.sharedInstance.IsAuthenticated())
+            HandleAuthentication();
     }
 
     public void HandleAuthentication(){
@@ -45,6 +50,9 @@ public class TitleManager : MonoBehaviour
         // profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId()
         Debug.Log("Signed in with Id: " + profileId);
         titelInterface.UpdateInterface();
+
+        //getLeaderBoard
+        Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
     }
 
     public void HandleLogOutButtonClick(){
@@ -64,13 +72,13 @@ public class TitleManager : MonoBehaviour
     }
 
     public void HandleLogInUniversalButtonClick(){
-        Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text);
+        Network.sharedInstance.RequestAuthenticationUniversal(titelInterface.userIDField.text, titelInterface.passwordField.text, OnAuthenticationRequestCompleted);
         OnAuthenticationRequestCompleted();
         titelInterface.closeAuthWindow();
     }
 
     public void HandleLogInEmailButtonClick(){
-        Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text);
+        Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text, OnAuthenticationRequestCompleted);
         OnAuthenticationRequestCompleted();
         titelInterface.closeAuthWindow();
         titelInterface.HandleButtons(true);
@@ -78,13 +86,42 @@ public class TitleManager : MonoBehaviour
 
     public void HandleSetUserNameButtonClick(){
         if(titelInterface.usernameField.text != null){
-            Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text);
+            Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text, OnAuthenticationRequestCompleted);
             Network.sharedInstance.UpdateUserPictureUrl("https://source.unsplash.com/user/c_v_r");
-            OnAuthenticationRequestCompleted();
+            // OnAuthenticationRequestCompleted();
             titelInterface.openUsernameWindow(false);
         }
         else{
             Debug.Log("Usrename field is required!");
         }
+    }
+
+    public void GoToScene(string scene){
+        switch(scene) 
+        {
+        case "Deadlift":
+            SceneManager.LoadScene("Deadlift");
+            break;
+        default:
+            Debug.Log("invalid scene name");
+            break;
+        }
+    }
+    
+    private void OnLeaderboardRequestCompleted(Leaderboard leaderboard){
+        leaderboardsManager.AddLeaderboard(leaderboard);
+    }
+
+    public Leaderboard GetLeaderboard(string LeaderboardID){
+        Leaderboard leaderboard = leaderboardsManager.GetLeaderboardByName(LeaderboardID);
+        Debug.Log(leaderboard.Name);
+        return leaderboard;
+    }
+
+    public void HandleDeadliftLeaderBoard(){
+        Leaderboard leaderboard = GetLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID);
+        titelInterface.openLeaderBoardUI(true);
+        populateLeaderBoardUI = GameObject.FindObjectOfType<PopulateLeaderBoardUI>();
+        populateLeaderBoardUI.PopulateContentContainer(leaderboard);
     }
 }
