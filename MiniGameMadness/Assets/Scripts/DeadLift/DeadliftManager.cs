@@ -21,7 +21,7 @@ public class DeadliftManager : MonoBehaviour
     Key currentKey = Key.Left;
     public Vector3 originalPosition;
 
-    private int gravity = 0;
+    private int gravity = 8;
     private int bonusMultiplier = 0;
 
     void Start()
@@ -34,7 +34,9 @@ public class DeadliftManager : MonoBehaviour
     public void SetEntitysForLevel(){
         if(entitiesManager.Modifiers.Count <= 0){
             gravity = 8;
+            Debug.Log("Gravity: " + gravity);
             bonusMultiplier = 1;
+            Debug.Log("BonusMultiplier: " + bonusMultiplier);
             return;
         }
         foreach(Modifier modifier in entitiesManager.Modifiers){
@@ -175,6 +177,6 @@ public class DeadliftManager : MonoBehaviour
     }
 
     public void HandleScorePost(){
-        Network.sharedInstance.PostScoreToLeaderboard("Deadlift", playerScore);
+        Network.sharedInstance.PostScoreToLeaderboards(playerScore);
     }
 }

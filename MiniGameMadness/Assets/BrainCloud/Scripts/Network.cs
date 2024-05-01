@@ -15,10 +15,10 @@ public class Network : MonoBehaviour
     public delegate void UpdateUserPictureUrlRequestCompleted();
     public delegate void UpdateUserPictureUrlRequestFailed();
     public delegate void LeaderboardRequestCompleted(Leaderboard leaderboard);
+    public delegate void LeaderboardsRequestCompleted(List<Leaderboard> leaderboard);
     public delegate void LeaderboardRequestFailed();
     public delegate void PostScoreRequestCompleted();
     public delegate void PostScoreRequestFailed();
-    // public delegate void RequestGlobalEntityDataCompleted(List<int> modifiers);
     public delegate void RequestGlobalEntityDataCompleted(List<Modifier> modifiers);
     public delegate void RequestGlobalEntityDataFailed();
 
@@ -387,6 +387,106 @@ public class Network : MonoBehaviour
 
             if (requestGlobalEntityDataFailed != null)
                 requestGlobalEntityDataFailed();
+        }
+    }
+
+    public void PostScoreToLeaderboards(int score, PostScoreRequestCompleted postScoreRequestCompleted = null, PostScoreRequestFailed postScoreRequestFailed = null)
+    {
+        PostScoreToLeaderboards(score, username, postScoreRequestCompleted, postScoreRequestFailed);
+    }
+
+    public void PostScoreToLeaderboards(int score, string nickname, PostScoreRequestCompleted postScoreRequestCompleted = null, PostScoreRequestFailed postScoreRequestFailed = null)
+    {
+        if (IsAuthenticated())
+        {
+            BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+            {
+                Debug.Log("PostScoreToLeaderboards success: " + responseData);
+
+                if (postScoreRequestCompleted != null)
+                    postScoreRequestCompleted();
+            };
+
+            BrainCloud.FailureCallback failureCallback = (statusMessage, code, error, cbObject) =>
+            {
+                Debug.Log("PostScoreToLeaderboards failed: " + statusMessage);
+
+                if (postScoreRequestFailed != null)
+                    postScoreRequestFailed();
+            };
+
+            string jsonScriptData = "{\"leaderboards\":[\"Deadlift\", \"Daily\"],\"score\":" + score + ",\"extras\":{\"nickname\":\"" + nickname + "\"}}";
+
+
+            m_BrainCloud.ScriptService.RunScript("PostToLeaderboards", jsonScriptData, successCallback, failureCallback);
+        }
+        else
+        {
+            Debug.Log("PostScoreToLeaderboards failed: user is not authenticated");
+
+            if (postScoreRequestFailed != null)
+                postScoreRequestFailed();
+        }
+    }
+
+    public void GetLeaderBoardsByLeaderboardId(string[] leaderboardIds, LeaderboardsRequestCompleted leaderboardsRequestCompleted = null, 
+        LeaderboardRequestFailed leaderboardRequestFailed = null)
+    {
+        if(IsAuthenticated()){
+            BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+            {
+                Debug.Log("GetLeaderBoardsByLeaderboardId request success: " + responseData);
+                JsonData jsonData = JsonMapper.ToObject(responseData);
+                JsonData leaderboards = jsonData["data"]["response"]["leaderboards"];
+
+                List<Leaderboard> leaderboardList = new List<Leaderboard>();
+
+                if(leaderboards.IsArray){
+                    for(int i = 0; i < leaderboards.Count; i++){
+
+                        string leaderboardId = leaderboardIds[i];
+
+                        JsonData leaderboard = leaderboards[i]["data"]["leaderboard"];
+
+                        List<LeaderboardEntry> leaderboardEntryList = new List<LeaderboardEntry>();
+                        int rank = 0;
+                        string nickname;
+                        int score = 0;
+
+                        if(leaderboard.IsArray){
+                            for(int j = 0; j < leaderboard.Count; j++){
+                                rank = int.Parse(leaderboard[j]["rank"].ToString());
+                                nickname = leaderboard[j]["data"]["nickname"].ToString();
+                                score = int.Parse(leaderboard[j]["score"].ToString());
+
+                                leaderboardEntryList.Add(new LeaderboardEntry(nickname, rank, score));
+                            }
+                        }
+                        Leaderboard lb = new Leaderboard(leaderboardId, leaderboardEntryList);
+                        leaderboardList.Add(lb);
+                    }
+                }
+
+                if (leaderboardsRequestCompleted != null)
+                    leaderboardsRequestCompleted(leaderboardList);
+            };
+
+            BrainCloud.FailureCallback failureCallback = (statusMessage, code, error, cbObject) =>
+            {
+                Debug.Log(string.Format("[GetLeaderBoardsByLeaderboardId Request Failed] {0}  {1}  {2}", statusMessage, code, error));
+
+                if (leaderboardRequestFailed != null)
+                    leaderboardRequestFailed();
+            };
+
+            string jsonScriptData = "{\"leaderboards\":[\"Deadlift\", \"Daily\"]}"; //TODO: stringbuilder
+            m_BrainCloud.ScriptService.RunScript("GetLeaderBoardsByLeaderboardId", jsonScriptData, successCallback, failureCallback);
+
+        }
+        else{
+            Debug.Log("Failed Request for GetLeaderBoardsByLeaderboardId. User is not Authenticated.");
+            if(leaderboardRequestFailed != null)
+                leaderboardRequestFailed();
         }
     }
 

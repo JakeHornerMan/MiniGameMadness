@@ -26,6 +26,7 @@ public class LeaderboardsManager : MonoBehaviour
 
         m_Leaderboards.RemoveAll(p => p.Name == leaderboard.Name);
         m_Leaderboards.Add(leaderboard);
+        Debug.Log("Leaderboard added: " + leaderboard.Name);
     }
 
     public Leaderboard GetLeaderboardByName(string name){

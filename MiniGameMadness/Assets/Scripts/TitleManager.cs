@@ -53,7 +53,12 @@ public class TitleManager : MonoBehaviour
         titelInterface.UpdateInterface();
 
         //getLeaderBoard
-        Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
+        // Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
+        
+        //GetLeaderBoardsByLeaderboardId
+        string[] leaderboardIds = {Constants.kBrainCloudDeadliftLeaderboardID, Constants.kBrainCloudDailyLeaderboardID};
+        Network.sharedInstance.GetLeaderBoardsByLeaderboardId(leaderboardIds, OnLeaderboardRequestCompleted);
+        
         //getGlobalEntitys
         Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
     }
@@ -113,6 +118,14 @@ public class TitleManager : MonoBehaviour
     
     private void OnLeaderboardRequestCompleted(Leaderboard leaderboard){
         leaderboardsManager.AddLeaderboard(leaderboard);
+    }
+
+    private void OnLeaderboardRequestCompleted(List<Leaderboard> leaderboards){
+        if(leaderboards.Count > 0){
+            foreach(Leaderboard leaderboard in leaderboards){
+                leaderboardsManager.AddLeaderboard(leaderboard);
+            }
+        }
     }
 
     private void OnGlobalEntityRequestCompleted(List<Modifier> modifiers){
