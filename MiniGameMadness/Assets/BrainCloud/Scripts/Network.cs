@@ -18,6 +18,9 @@ public class Network : MonoBehaviour
     public delegate void LeaderboardRequestFailed();
     public delegate void PostScoreRequestCompleted();
     public delegate void PostScoreRequestFailed();
+    // public delegate void RequestGlobalEntityDataCompleted(List<int> modifiers);
+    public delegate void RequestGlobalEntityDataCompleted(List<Modifier> modifiers);
+    public delegate void RequestGlobalEntityDataFailed();
 
 
     public string brainCloudVersion;
@@ -337,6 +340,53 @@ public class Network : MonoBehaviour
 
             if (postScoreRequestFailed != null)
                 postScoreRequestFailed();
+        }
+    }
+
+    public void RequestGlobalEntityData(string globalEntityIndexedID, RequestGlobalEntityDataCompleted requestGlobalEntityDataCompleted = null, 
+        RequestGlobalEntityDataFailed requestGlobalEntityDataFailed = null){
+        if (IsAuthenticated()){
+            BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
+            {
+                Debug.Log("RequestGlobalEntityData success: " + responseData);
+
+                List<Modifier> modifiers = new List<Modifier>();
+                JsonData jsonData = JsonMapper.ToObject(responseData);
+                JsonData entityList = jsonData["data"]["entityList"];
+
+                if (entityList.IsArray)
+                {
+                    for (int i = 0; i < entityList.Count; i++){
+                        if(entityList[i]["entityIndexedId"].ToString() == "Modifier"){
+                            Debug.Log("Modifier!");
+                            string title = entityList[i]["entityType"].ToString();
+                            int value = int.Parse(entityList[i]["data"]["value"].ToString());
+                            Modifier mod = new Modifier(title, value);
+                            modifiers.Add(mod);
+                        }
+                    }
+                }
+
+                if (requestGlobalEntityDataCompleted != null)
+                    requestGlobalEntityDataCompleted(modifiers);
+            };
+
+            BrainCloud.FailureCallback failureCallback = (statusMessage, code, error, cbObject) =>
+            {
+                Debug.Log("RequestGlobalEntityData failed: " + statusMessage);
+
+                if (requestGlobalEntityDataFailed != null)
+                    requestGlobalEntityDataFailed();
+            };
+
+            m_BrainCloud.GlobalEntityService.GetListByIndexedId(globalEntityIndexedID, 10, successCallback, failureCallback);
+        }
+        else
+        {
+            Debug.Log("RequestGlobalEntityData failed: user is not authenticated");
+
+            if (requestGlobalEntityDataFailed != null)
+                requestGlobalEntityDataFailed();
         }
     }
 

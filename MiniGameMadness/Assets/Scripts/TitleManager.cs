@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class TitleManager : MonoBehaviour
 {
     [SerializeField] private LeaderboardsManager leaderboardsManager;
+    [SerializeField] private EntitiesManager entitiesManager;
     public string profileId; 
     public string brainCloudVersion;
     [SerializeField] private TitelInterface titelInterface;
@@ -53,6 +54,8 @@ public class TitleManager : MonoBehaviour
 
         //getLeaderBoard
         Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
+        //getGlobalEntitys
+        Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
     }
 
     public void HandleLogOutButtonClick(){
@@ -110,6 +113,14 @@ public class TitleManager : MonoBehaviour
     
     private void OnLeaderboardRequestCompleted(Leaderboard leaderboard){
         leaderboardsManager.AddLeaderboard(leaderboard);
+    }
+
+    private void OnGlobalEntityRequestCompleted(List<Modifier> modifiers){
+        if(modifiers.Count > 0){
+            foreach(Modifier modifier in modifiers){
+                entitiesManager.AddToModifier(modifier);
+            }
+        }
     }
 
     public Leaderboard GetLeaderboard(string LeaderboardID){

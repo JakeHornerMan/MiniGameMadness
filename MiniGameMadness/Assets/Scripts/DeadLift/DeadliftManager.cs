@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class DeadliftManager : MonoBehaviour
 {
     public DeadliftInterfaceManager dlInterface;
+    private EntitiesManager entitiesManager;
     public GameObject deadlifter;
     public List<int> deadLifts;
     public int roundNumber = -1;
@@ -20,9 +21,32 @@ public class DeadliftManager : MonoBehaviour
     Key currentKey = Key.Left;
     public Vector3 originalPosition;
 
+    private int gravity = 0;
+    private int bonusMultiplier = 0;
+
     void Start()
     {
         originalPosition = deadlifter.transform.position;
+        entitiesManager = GameObject.FindObjectOfType<EntitiesManager>();
+        SetEntitysForLevel();
+    }
+
+    public void SetEntitysForLevel(){
+        if(entitiesManager.Modifiers.Count <= 0){
+            gravity = 8;
+            bonusMultiplier = 1;
+            return;
+        }
+        foreach(Modifier modifier in entitiesManager.Modifiers){
+            if(modifier.Title == "Gravity"){
+                gravity = modifier.Value;
+                Debug.Log("Gravity: " + gravity);
+            } 
+            if(modifier.Title == "BonusMultiplier"){
+                bonusMultiplier = modifier.Value;
+                Debug.Log("BonusMultiplier: " + bonusMultiplier);
+            }
+        }
     }
 
     void Update()
@@ -78,15 +102,6 @@ public class DeadliftManager : MonoBehaviour
         }
     }
 
-    public void CaculatePoints(){
-        int add;
-        add = deadLifts[roundNumber] * 100;
-        add += (int)(timeleft * 100);
-        Debug.Log("Pointes added: " + add);
-        playerScore += add;
-        dlInterface.SetScore(playerScore);
-    }
-
     public void Timer(){
         if(timeleft > 0){
             timeleft -= Time.deltaTime;
@@ -107,12 +122,21 @@ public class DeadliftManager : MonoBehaviour
         deadlifter.GetComponent<Animator>().Play("progress");
         roundNumber++;
         dlInterface.UpdateWeight(deadLifts[roundNumber]);
-        currentDeadlift = deadLifts[roundNumber]/7;
+        currentDeadlift = deadLifts[roundNumber]/gravity;
         Debug.Log("targetNum: " + currentDeadlift);
         timeleft = timeAmount;
         counterProgress = 0;
         CountDown(3);
         Debug.Log("LETS LIFT");
+    }
+
+    public void CaculatePoints(){
+        int add;
+        add = deadLifts[roundNumber] * 100;
+        add += (int)(timeleft * 100)*bonusMultiplier;
+        Debug.Log("Pointes added: " + add);
+        playerScore += add;
+        dlInterface.SetScore(playerScore);
     }
 
     public void CountDown(int number){
