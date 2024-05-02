@@ -54,16 +54,22 @@ public class TitleManager : MonoBehaviour
         titelInterface.closeAuthWindow();
         titelInterface.HandleButtons(true);
         brainCloudVersion =  Network.sharedInstance.brainCloudVersion;
-        if(Network.sharedInstance.username != ""){
+        if(Network.sharedInstance.username != "" || Network.sharedInstance.username != null){
             profileId = Network.sharedInstance.username;
         }
         else { 
-            if(Network.sharedInstance.email != ""){
+            if(Network.sharedInstance.email != "" || Network.sharedInstance.email != null){
                 profileId = Network.sharedInstance.email;
             }
             else{
                 profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
             }
+        }
+        if(profileId != Network.sharedInstance.m_BrainCloud.GetStoredProfileId()){
+            titelInterface.HandleButtons(true);
+        }
+        else{
+            titelInterface.HandleButtons(false);
         }
         
         Debug.Log("Signed in with Id: " + profileId);
