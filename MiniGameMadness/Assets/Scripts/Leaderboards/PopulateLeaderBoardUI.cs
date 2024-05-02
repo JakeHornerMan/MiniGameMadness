@@ -22,4 +22,6 @@ public class PopulateLeaderBoardUI : MonoBehaviour
         }
 
     }
+
+    //TODO: rest score board for daily data
 }
