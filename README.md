@@ -27,4 +27,4 @@ The more I used the brain cloud platform the more I liked the service and API st
 I struggled with the project scope and within a reasonable time frame. The original plan I laid out was playing multiple mini-games asynchronously with a lobby in a competition. Although this would have been possible using the brain cloud structure using Lobby Service, the time required to learn the brain cloud service and develop multiple minigames with a reasonable amount of polish would have been too much.
 
 ## Skills I have learned:
-Im am very comfortable with the brain cloud service, and I will be tinkering and using this for my projects.
+Im am very comfortable with the brain cloud service, and I will be tinkering and using this for my future projects.
