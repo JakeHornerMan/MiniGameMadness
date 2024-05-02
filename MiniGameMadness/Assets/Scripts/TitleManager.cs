@@ -17,7 +17,7 @@ public class TitleManager : MonoBehaviour
     private PopulateLeaderBoardUI populateLeaderBoardUI;
 
     void Start(){
-        if(!Network.sharedInstance.IsAuthenticated())
+        if(!Network.sharedInstance.IsAuthenticated() || profileId == null)
             HandleAuthentication();
     }
 
@@ -56,8 +56,7 @@ public class TitleManager : MonoBehaviour
         // Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
         
         //GetLeaderBoardsByLeaderboardId
-        string[] leaderboardIds = {Constants.kBrainCloudDeadliftLeaderboardID, Constants.kBrainCloudDailyLeaderboardID};
-        Network.sharedInstance.GetLeaderBoardsByLeaderboardId(leaderboardIds, OnLeaderboardRequestCompleted);
+        leaderboardsManager.RefreshLeaderboards();
         
         //getGlobalEntitys
         Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
@@ -96,7 +95,6 @@ public class TitleManager : MonoBehaviour
         if(titelInterface.usernameField.text != null){
             Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text, OnAuthenticationRequestCompleted);
             Network.sharedInstance.UpdateUserPictureUrl("https://source.unsplash.com/user/c_v_r");
-            // OnAuthenticationRequestCompleted();
             titelInterface.openUsernameWindow(false);
         }
         else{
@@ -113,18 +111,6 @@ public class TitleManager : MonoBehaviour
         default:
             Debug.Log("invalid scene name");
             break;
-        }
-    }
-    
-    private void OnLeaderboardRequestCompleted(Leaderboard leaderboard){
-        leaderboardsManager.AddLeaderboard(leaderboard);
-    }
-
-    private void OnLeaderboardRequestCompleted(List<Leaderboard> leaderboards){
-        if(leaderboards.Count > 0){
-            foreach(Leaderboard leaderboard in leaderboards){
-                leaderboardsManager.AddLeaderboard(leaderboard);
-            }
         }
     }
 
@@ -146,6 +132,6 @@ public class TitleManager : MonoBehaviour
         Leaderboard leaderboard = GetLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID);
         titelInterface.openLeaderBoardUI(true);
         populateLeaderBoardUI = GameObject.FindObjectOfType<PopulateLeaderBoardUI>();
-        populateLeaderBoardUI.PopulateContentContainer(leaderboard);
+        populateLeaderBoardUI.RepopulateContentContainer(leaderboard);
     }
 }

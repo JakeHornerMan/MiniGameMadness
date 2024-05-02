@@ -7,31 +7,18 @@ public class ResultsManager : MonoBehaviour
 {
     private LeaderboardsManager leaderboardsManager;
     private PopulateLeaderBoardUI populateLeaderBoardUI;
+    public GameObject leaderboardPanel;
 
     void Awake(){
         leaderboardsManager = GameObject.FindObjectOfType<LeaderboardsManager>();
         populateLeaderBoardUI = GameObject.FindObjectOfType<PopulateLeaderBoardUI>();
-    }
-
-    void Start()
-    {
-        Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
-    }
-
-    private void OnLeaderboardRequestCompleted(Leaderboard leaderboard){
-        leaderboardsManager.AddLeaderboard(leaderboard);
-        HandleDeadliftLeaderBoard();
-    }
-
-    public Leaderboard GetLeaderboard(string LeaderboardID){
-        Leaderboard leaderboard = leaderboardsManager.GetLeaderboardByName(LeaderboardID);
-        Debug.Log(leaderboard.Name);
-        return leaderboard;
+        leaderboardsManager.RefreshLeaderboards();
     }
 
     public void HandleDeadliftLeaderBoard(){
-        Leaderboard leaderboard = GetLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID);
-        populateLeaderBoardUI.PopulateContentContainer(leaderboard);
+        leaderboardPanel.SetActive(true);
+        populateLeaderBoardUI = GameObject.FindObjectOfType<PopulateLeaderBoardUI>();
+        populateLeaderBoardUI.OnAllTimeButtonClick();
     }
 
     public void GoToScene(string scene){

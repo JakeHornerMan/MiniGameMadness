@@ -8,6 +8,7 @@ public class LeaderboardsManager : MonoBehaviour
 
     public List<Leaderboard> m_Leaderboards;
     private int m_UserScore;
+    // private PopulateLeaderBoardUI populateLeaderBoardUI;
 
     private void Awake(){
         sharedInstance = this;
@@ -32,6 +33,7 @@ public class LeaderboardsManager : MonoBehaviour
     public Leaderboard GetLeaderboardByName(string name){
         for(int i = 0; i < m_Leaderboards.Count; i++){
             if(m_Leaderboards[i].Name == name){
+                // Debug.Log(m_Leaderboards[i].Name);
                 return m_Leaderboards[i];
             }
         }
@@ -40,5 +42,18 @@ public class LeaderboardsManager : MonoBehaviour
 
     public int GetCount(){
         return m_Leaderboards.Count;
+    }
+
+    public void RefreshLeaderboards(){
+        string[] leaderboardIds = {Constants.kBrainCloudDeadliftLeaderboardID, Constants.kBrainCloudDailyLeaderboardID};
+        Network.sharedInstance.GetLeaderBoardsByLeaderboardId(leaderboardIds, OnLeaderboardRequestCompleted);
+    }
+
+    private void OnLeaderboardRequestCompleted(List<Leaderboard> leaderboards){
+        if(leaderboards.Count > 0){
+            foreach(Leaderboard leaderboard in leaderboards){
+                AddLeaderboard(leaderboard);
+            }
+        }
     }
 }

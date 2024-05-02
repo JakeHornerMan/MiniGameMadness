@@ -249,7 +249,7 @@ public class Network : MonoBehaviour
             // Debug.Log("emailAddress found");
             email = json["data"]["emailAddress"].ToString();
         }
-        Debug.Log("email: " + email + ", username: " + username);
+        // Debug.Log("email: " + email + ", username: " + username);
         if(authenticationRequestCompleted != null)
             authenticationRequestCompleted();
     }
@@ -358,7 +358,7 @@ public class Network : MonoBehaviour
                 {
                     for (int i = 0; i < entityList.Count; i++){
                         if(entityList[i]["entityIndexedId"].ToString() == "Modifier"){
-                            Debug.Log("Modifier!");
+                            // Debug.Log("Modifier!");
                             string title = entityList[i]["entityType"].ToString();
                             int value = int.Parse(entityList[i]["data"]["value"].ToString());
                             Modifier mod = new Modifier(title, value);

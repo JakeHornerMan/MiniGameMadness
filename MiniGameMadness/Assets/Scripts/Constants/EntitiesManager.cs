@@ -20,7 +20,7 @@ public class EntitiesManager : MonoBehaviour
 
     public void AddToModifier(Modifier modifier){
         m_Modifiers.Add(modifier);
-        Debug.Log("Entity added: " + modifier.Title);
+        // Debug.Log("Entity added: " + modifier.Title);
     }
 }
 
