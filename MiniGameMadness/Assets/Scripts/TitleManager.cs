@@ -26,14 +26,33 @@ public class TitleManager : MonoBehaviour
         if(Network.sharedInstance.HasAuthenticatedPreviously()){
             Debug.Log("Reconnect Authentication");
             Network.sharedInstance.Reconnect(OnAuthenticationRequestCompleted);
+            titelInterface.HandleButtons(true);
         }
         else{
             Debug.Log("Anonymous Authentication");
-            Network.sharedInstance.RequestAnonymousAuthentication(OnAuthenticationRequestCompleted);
+            Network.sharedInstance.RequestAnonymousAuthentication(OnAnonAuthenticationRequestCompleted);
+            titelInterface.HandleButtons(false);
         }
     }
 
+    public void OnAnonAuthenticationRequestCompleted(){
+        titelInterface.HandleButtons(false);
+        brainCloudVersion =  Network.sharedInstance.brainCloudVersion;
+        profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId();
+        Debug.Log("Signed in with Id: " + profileId);
+        titelInterface.UpdateInterface();
+
+        if(leaderboardsManager.GetCount() <= 0){
+            leaderboardsManager.RefreshLeaderboards();
+        }
+        if(entitiesManager.GetCount() <= 0){
+            Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
+        }        
+    }
+
     public void OnAuthenticationRequestCompleted(){
+        titelInterface.closeAuthWindow();
+        titelInterface.HandleButtons(true);
         brainCloudVersion =  Network.sharedInstance.brainCloudVersion;
         if(Network.sharedInstance.username != ""){
             profileId = Network.sharedInstance.username;
@@ -47,18 +66,15 @@ public class TitleManager : MonoBehaviour
             }
         }
         
-        // profileId = Network.sharedInstance.m_BrainCloud.GetStoredProfileId()
         Debug.Log("Signed in with Id: " + profileId);
         titelInterface.UpdateInterface();
-
-        //getLeaderBoard
-        // Network.sharedInstance.RequestLeaderboard(Constants.kBrainCloudDeadliftLeaderboardID, OnLeaderboardRequestCompleted);
         
-        //GetLeaderBoardsByLeaderboardId
-        leaderboardsManager.RefreshLeaderboards();
-        
-        //getGlobalEntitys
-        Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
+        if(leaderboardsManager.GetCount() <= 0){
+            leaderboardsManager.RefreshLeaderboards();
+        }
+        if(entitiesManager.GetCount() <= 0){
+            Network.sharedInstance.RequestGlobalEntityData(Constants.kBrainCloudGlobalEntityIndexedID, OnGlobalEntityRequestCompleted);
+        }  
     }
 
     public void HandleLogOutButtonClick(){
@@ -84,15 +100,23 @@ public class TitleManager : MonoBehaviour
     }
 
     public void HandleLogInEmailButtonClick(){
-        Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text, OnAuthenticationRequestCompleted);
-        OnAuthenticationRequestCompleted();
-        titelInterface.closeAuthWindow();
-        titelInterface.HandleButtons(true);
+        Network.sharedInstance.RequestAuthenticationEmail(titelInterface.userIDField.text, titelInterface.passwordField.text, HandleLogInEmailSuccess, HandleLogInEmailFail);
+    }
+
+    public void HandleLogInEmailFail(){
+        Debug.Log("All fields are required.");
+        titelInterface.SetAuthErrorText("All fields are required.");
+    }
+
+    public void HandleLogInEmailSuccess(){
+        if(titelInterface.changeUsernameField.text != null){
+            Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text, OnAuthenticationRequestCompleted, HandleLogInEmailFail);
+        }
     }
 
     public void HandleSetUserNameButtonClick(){
-        if(titelInterface.usernameField.text != null){
-            Network.sharedInstance.UpdateUserName(titelInterface.usernameField.text, OnAuthenticationRequestCompleted);
+        if(titelInterface.changeUsernameField.text != null){
+            Network.sharedInstance.UpdateUserName(titelInterface.changeUsernameField.text, OnAuthenticationRequestCompleted);
             Network.sharedInstance.UpdateUserPictureUrl("https://source.unsplash.com/user/c_v_r");
             titelInterface.openUsernameWindow(false);
         }

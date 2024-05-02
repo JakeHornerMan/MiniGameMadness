@@ -22,6 +22,9 @@ public class EntitiesManager : MonoBehaviour
         m_Modifiers.Add(modifier);
         // Debug.Log("Entity added: " + modifier.Title);
     }
+    public int GetCount(){
+        return m_Modifiers.Count;
+    }
 }
 
 public class Modifier

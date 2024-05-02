@@ -6,6 +6,7 @@ using LitJson;
 
 public class Network : MonoBehaviour
 {
+    public delegate void AnonAuthenticationRequestCompleted();
     public delegate void AuthenticationRequestCompleted();
     public delegate void AuthenticationRequestFailed();
     public delegate void BrainCloudLogOutCompleted();
@@ -69,14 +70,14 @@ public class Network : MonoBehaviour
         return m_BrainCloud.GetStoredProfileId() != "" && m_BrainCloud.GetStoredAnonymousId() != "";
     }
 
-    public void RequestAnonymousAuthentication(AuthenticationRequestCompleted authenticationRequestCompleted = null,
+    public void RequestAnonymousAuthentication(AnonAuthenticationRequestCompleted authenticationRequestCompleted = null,
     AuthenticationRequestFailed authenticationRequestFailed = null){
         BrainCloud.SuccessCallback successCallback = (responseData, cbObject) =>
         {
             Debug.Log("RequestAnonymousAuthentication success: " + responseData);
             username = null;
             email = null;
-            HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
+            HandleAnonAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
         };
 
         BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
@@ -147,7 +148,7 @@ public class Network : MonoBehaviour
             Debug.Log("UniversalAuthentication success: " + responseData);
             username = null;
             email = null;
-            HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
+            // HandleAuthenticationSuccess(responseData, cbObject, authenticationRequestCompleted);
         };
 
         BrainCloud.FailureCallback failureCallback = (status, code, error, cbObject) =>
@@ -237,6 +238,11 @@ public class Network : MonoBehaviour
             if(updateUserPictureUrlRequestFailed != null)
                     updateUserPictureUrlRequestFailed();
         }
+    }
+
+    private void HandleAnonAuthenticationSuccess(string responseData, object cbObject, AnonAuthenticationRequestCompleted authenticationRequestCompleted = null){
+        if(authenticationRequestCompleted != null)
+            authenticationRequestCompleted();
     }
 
     private void HandleAuthenticationSuccess(string responseData, object cbObject, AuthenticationRequestCompleted authenticationRequestCompleted = null){

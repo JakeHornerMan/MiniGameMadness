@@ -9,11 +9,13 @@ public class TitelInterface : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI profileId;
     [SerializeField] private TextMeshProUGUI versionText;
+    [SerializeField] private TextMeshProUGUI authErrorText;
     [SerializeField] private GameObject authWindow;
     [SerializeField] private GameObject usernameWindow;
     [SerializeField] public TMP_InputField userIDField;
     [SerializeField] public TMP_InputField passwordField;
     [SerializeField] public TMP_InputField usernameField;
+    [SerializeField] public TMP_InputField changeUsernameField;
     [SerializeField] private GameObject logOutBtn;
     [SerializeField] private GameObject logInBtn;
     [SerializeField] private GameObject changeUsernameBtn;
@@ -59,6 +61,10 @@ public class TitelInterface : MonoBehaviour
 
     public void openLeaderBoardUI(bool isOpen){
         leaderBoardUI.SetActive(isOpen);
+    }
+
+    public void SetAuthErrorText(string text){
+        authErrorText.text = text;
     }
     
 
