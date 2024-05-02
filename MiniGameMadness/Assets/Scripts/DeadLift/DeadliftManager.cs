@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class DeadliftManager : MonoBehaviour
 {
+    [SerializeField] private PopulateEntityUI populateEntityUI;
     public DeadliftInterfaceManager dlInterface;
     private EntitiesManager entitiesManager;
     public GameObject deadlifter;
@@ -49,6 +50,7 @@ public class DeadliftManager : MonoBehaviour
                 Debug.Log("BonusMultiplier: " + bonusMultiplier);
             }
         }
+        populateEntityUI.PopulateEntityContainer();
     }
 
     void Update()
@@ -56,13 +58,6 @@ public class DeadliftManager : MonoBehaviour
         if(gameState == State.Progress){
             DeadLifting();
             Timer();
-        }
-        if(gameState == State.Success){
-            if (Input.GetKeyDown(KeyCode.Space))
-                SetUpLift();
-        }
-        if(gameState == State.Finished){
-            //end Game
         }
     }
 
@@ -127,6 +122,7 @@ public class DeadliftManager : MonoBehaviour
         currentDeadlift = deadLifts[roundNumber]/gravity;
         Debug.Log("targetNum: " + currentDeadlift);
         timeleft = timeAmount;
+        dlInterface.SetTimer(timeleft);
         counterProgress = 0;
         CountDown(3);
         Debug.Log("LETS LIFT");

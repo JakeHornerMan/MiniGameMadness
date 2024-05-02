@@ -6,12 +6,14 @@ using UnityEngine.UI;
 
 public class PopulateEntityUI : MonoBehaviour
 {
-    public GameObject entityPrefab;
     private EntitiesManager entitiesManager;
+    List<GameObject> entities;
+    public GameObject entityPrefab;
     
     void Start()
     {
         entitiesManager = GameObject.FindObjectOfType<EntitiesManager>();
+        entities = new List<GameObject>();
     }
 
     public void PopulateEntityContainer(){
@@ -21,4 +23,5 @@ public class PopulateEntityUI : MonoBehaviour
             spwaned.GetComponent<TextMeshProUGUI>().text = entity.Title + " = " + entity.Value;
         }
     }
+
 }
