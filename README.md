@@ -1,5 +1,6 @@
 # Deadlifting Minigame
 I created a mini-game, with brain cloud integrations in and around 15 hours development time. 
+
 The game has an anonymous authentication, email authentication, and username setting.
 The game has fully functional all-time and daily high score leaderboards.
 The game is a button masher that gets proceedly difficult each round.
