@@ -7,6 +7,7 @@ public class TitleManager : MonoBehaviour
 {
     [SerializeField] private LeaderboardsManager leaderboardsManager;
     [SerializeField] private EntitiesManager entitiesManager;
+    [SerializeField] private PopulateEntityUI populateEntityUI;
     public string profileId; 
     public string brainCloudVersion;
     [SerializeField] private TitelInterface titelInterface;
@@ -120,6 +121,7 @@ public class TitleManager : MonoBehaviour
                 entitiesManager.AddToModifier(modifier);
             }
         }
+        populateEntityUI.PopulateEntityContainer();
     }
 
     public Leaderboard GetLeaderboard(string LeaderboardID){
